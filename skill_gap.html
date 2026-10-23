@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% from "_macros.html" import skill_badges, priority_badge, analysis_nav %}
+{% block title %}Skill Gap Analysis{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <h2 class="fw-bold mb-1">Skill Gap Analysis</h2>
+  <p class="text-muted mb-4">{{ analysis.job_title }}{% if analysis.company %} at {{ analysis.company }}{% endif %} &middot; Resume: {{ analysis.resume_file_name }}</p>
+
+  {{ analysis_nav(analysis.analysis_id, 'skill_gap') }}
+
+  <div class="row g-4 mb-4">
+    <div class="col-md-4">
+      <div class="card p-4 h-100">
+        <h6 class="fw-bold mb-3">Skills Overview</h6>
+        <canvas id="skillDoughnut" height="220"></canvas>
+      </div>
+    </div>
+    <div class="col-md-8">
+      <div class="row g-3 h-100">
+        <div class="col-4">
+          <div class="stat-card border h-100 text-center">
+            <div class="stat-value" style="color: var(--success);">{{ matching|length }}</div>
+            <div class="stat-label">Matching</div>
+          </div>
+        </div>
+        <div class="col-4">
+          <div class="stat-card border h-100 text-center">
+            <div class="stat-value" style="color: var(--danger);">{{ missing|length }}</div>
+            <div class="stat-label">Missing</div>
+          </div>
+        </div>
+        <div class="col-4">
+          <div class="stat-card border h-100 text-center">
+            <div class="stat-value" style="color: var(--brand);">{{ additional|length }}</div>
+            <div class="stat-label">Additional</div>
+          </div>
+        </div>
+        <div class="col-12">
+          <div class="card p-3 h-100">
+            <h6 class="fw-bold mb-2">Missing Skills by Priority</h6>
+            {% if missing %}
+            <div class="table-responsive">
+              <table class="table table-sm align-middle mb-0">
+                <thead><tr class="text-muted small text-uppercase"><th>Skill</th><th>Priority</th></tr></thead>
+                <tbody>
+                {% for name, priority in missing %}
+                  <tr><td>{{ name }}</td><td>{{ priority_badge(priority) }}</td></tr>
+                {% endfor %}
+                </tbody>
+              </table>
+            </div>
+            {% else %}
+            <p class="text-muted mb-0">No missing required skills — great job!</p>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-md-6">
+      <div class="card p-4 h-100">
+        <h6 class="fw-bold mb-3">Matching Skills</h6>
+        {% if matching %}{{ skill_badges(matching, 'matching') }}{% else %}<p class="text-muted mb-0">None detected.</p>{% endif %}
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card p-4 h-100">
+        <h6 class="fw-bold mb-3">Additional Skills on Your Resume</h6>
+        {% if additional %}{{ skill_badges(additional, 'additional') }}{% else %}<p class="text-muted mb-0">None beyond the job's requirements.</p>{% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+renderDoughnutChart(
+  'skillDoughnut',
+  ['Matching', 'Missing', 'Additional'],
+  [{{ matching|length }}, {{ missing|length }}, {{ additional|length }}],
+  ['#0f9d6e', '#dc2626', '#3652e0']
+);
+</script>
+{% endblock %}

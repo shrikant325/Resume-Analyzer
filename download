@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+
+# Flask / app data
+instance/*.db
+instance/*.sqlite3
+uploads/*
+!uploads/.gitkeep
+.env
+
+# OS / editor
+.DS_Store
+.vscode/
+.idea/
+
+# Test artifacts
+.pytest_cache/
+*.log

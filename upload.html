@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Upload Resume{% endblock %}
+{% block content %}
+<div class="container py-4" style="max-width: 620px;">
+  <h2 class="fw-bold mb-1">Upload Your Resume</h2>
+  <p class="text-muted mb-4">We accept PDF and DOCX files (up to 8&nbsp;MB) and extract the text automatically for analysis.</p>
+  <div class="card p-4">
+    <form method="POST" enctype="multipart/form-data" novalidate>
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <label for="resume_file" class="upload-dropzone d-block mb-3">
+        <i class="bi bi-cloud-arrow-up fs-1 mb-2 d-block" style="color: var(--brand);"></i>
+        <span data-file-label class="fw-semibold">Click to choose a PDF or DOCX file</span>
+        <div class="text-muted small mt-1">or drag and drop it here</div>
+      </label>
+      <input class="form-control d-none" type="file" id="resume_file" name="resume_file" accept=".pdf,.docx" required>
+      <button type="submit" class="btn btn-primary w-100 py-2">Upload &amp; Analyze</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

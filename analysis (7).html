@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}{{ job.job_title }}{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <div class="mb-4">
+    <h2 class="fw-bold mb-1">{{ job.job_title }}</h2>
+    <p class="text-muted mb-0">{% if job.company %}{{ job.company }} &middot; {% endif %}Added {{ job.created_at|dt }}</p>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-md-7">
+      <div class="card p-4 mb-4">
+        <h6 class="fw-bold mb-3">Required Skills ({{ parsed.required_skills|length }})</h6>
+        {% if parsed.required_skills %}
+          {% for s in parsed.required_skills %}<span class="skill-badge missing">{{ s }}</span>{% endfor %}
+        {% else %}<p class="text-muted mb-0">No specific required skills detected.</p>{% endif %}
+      </div>
+      {% if parsed.preferred_skills %}
+      <div class="card p-4 mb-4">
+        <h6 class="fw-bold mb-3">Preferred Skills ({{ parsed.preferred_skills|length }})</h6>
+        {% for s in parsed.preferred_skills %}<span class="skill-badge additional">{{ s }}</span>{% endfor %}
+      </div>
+      {% endif %}
+      <div class="card p-4">
+        <h6 class="fw-bold mb-3">Full Description</h6>
+        <p class="mb-0" style="white-space: pre-wrap; max-height: 320px; overflow-y: auto;">{{ job.description }}</p>
+      </div>
+    </div>
+    <div class="col-md-5">
+      <div class="card p-4 mb-4">
+        <h6 class="fw-bold mb-3">Extracted Requirements</h6>
+        <p class="mb-2 small">Education: <strong>{{ parsed.education_keyword|title if parsed.education_keyword else 'Not specified' }}</strong></p>
+        <p class="mb-0 small">Experience: <strong>{{ (parsed.experience_years_required ~ '+ years') if parsed.experience_years_required else 'Not specified' }}</strong></p>
+      </div>
+      <div class="card p-4 mb-4">
+        <h6 class="fw-bold mb-3">Top Keywords</h6>
+        {% if parsed.keywords %}
+          {% for k in parsed.keywords[:12] %}<span class="badge bg-light text-dark border me-1 mb-1 py-2 px-3">{{ k }}</span>{% endfor %}
+        {% else %}<p class="text-muted mb-0">No keywords extracted.</p>{% endif %}
+      </div>
+      <div class="card p-4">
+        <h6 class="fw-bold mb-3">Run Compatibility Analysis</h6>
+        {% if resumes %}
+        <form method="POST" action="{{ url_for('analysis.run') }}" class="row g-2 align-items-end">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <input type="hidden" name="job_id" value="{{ job.job_id }}">
+          <div class="col-12">
+            <select class="form-select mb-2" name="resume_id" required>
+              <option value="" disabled selected>Choose a resume...</option>
+              {% for r in resumes %}<option value="{{ r.resume_id }}">{{ r.file_name }}</option>{% endfor %}
+            </select>
+          </div>
+          <div class="col-12">
+            <button type="submit" class="btn btn-primary w-100">Run Analysis</button>
+          </div>
+        </form>
+        {% else %}
+        <p class="text-muted mb-2">You need to upload a resume first.</p>
+        <a href="{{ url_for('resume.upload') }}" class="btn btn-primary btn-sm">Upload Resume</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

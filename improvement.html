@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% from "_macros.html" import priority_badge, analysis_nav %}
+{% block title %}Resume Improvements{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <h2 class="fw-bold mb-1">Resume Improvement Suggestions</h2>
+  <p class="text-muted mb-4">{{ analysis.job_title }}{% if analysis.company %} at {{ analysis.company }}{% endif %} &middot; Resume: {{ analysis.resume_file_name }}</p>
+
+  {{ analysis_nav(analysis.analysis_id, 'improvement') }}
+
+  {% if improvements %}
+  <div class="card p-4">
+    <h6 class="fw-bold mb-3">{{ improvements|length }} Suggestion{{ 's' if improvements|length != 1 }}</h6>
+    {% for rec in improvements %}
+    <div class="check-row">
+      {{ priority_badge(rec.priority) }}
+      <span class="small">{{ rec.recommendation_text }}</span>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="card p-4 text-center py-5">
+    <i class="bi bi-check-circle fs-1 mb-2" style="color: var(--success);"></i>
+    <p class="mb-0 fw-semibold">No specific improvement suggestions — your resume looks solid for this role!</p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

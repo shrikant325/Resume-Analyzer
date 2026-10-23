@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% from "_macros.html" import score_ring, analysis_nav %}
+{% block title %}Compatibility Breakdown{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <h2 class="fw-bold mb-1">Compatibility Breakdown</h2>
+  <p class="text-muted mb-4">{{ analysis.job_title }}{% if analysis.company %} at {{ analysis.company }}{% endif %} &middot; Resume: {{ analysis.resume_file_name }}</p>
+
+  {{ analysis_nav(analysis.analysis_id, 'compatibility') }}
+
+  <div class="row g-4">
+    <div class="col-md-4">
+      <div class="card p-4 text-center h-100 d-flex flex-column justify-content-center">
+        {{ score_ring(analysis.compatibility_score, 'Compatibility') }}
+        <div class="mt-3 fw-semibold">{{ interpretation }}</div>
+        <p class="text-muted small mt-2 mb-0">Weighted combination of skill match (40%), keyword match (20%), semantic similarity (20%), education (10%), and experience (10%).</p>
+      </div>
+    </div>
+    <div class="col-md-8">
+      <div class="card p-4 h-100">
+        <h6 class="fw-bold mb-3">Score Components</h6>
+        <canvas id="breakdownChart" height="220"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4 mt-1">
+    <div class="col-md-6">
+      <div class="card p-4">
+        <h6 class="fw-bold mb-3">Education Match</h6>
+        <div class="d-flex align-items-center gap-3 mb-2">
+          <div class="progress flex-grow-1"><div class="progress-bar" role="progressbar" style="width: {{ analysis.education_match_score|pct }}%; background: var(--brand);"></div></div>
+          <span class="font-mono small fw-semibold">{{ analysis.education_match_score|pct }}%</span>
+        </div>
+        <p class="text-muted small mb-0">Compares the highest education level detected on the resume against what the job description requires.</p>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card p-4">
+        <h6 class="fw-bold mb-3">Experience Match</h6>
+        <div class="d-flex align-items-center gap-3 mb-2">
+          <div class="progress flex-grow-1"><div class="progress-bar" role="progressbar" style="width: {{ analysis.experience_match_score|pct }}%; background: var(--brand);"></div></div>
+          <span class="font-mono small fw-semibold">{{ analysis.experience_match_score|pct }}%</span>
+        </div>
+        <p class="text-muted small mb-0">Compares years of experience mentioned on the resume against the years required by the job description.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="card p-4 mt-4">
+    <h6 class="fw-bold mb-2"><i class="bi bi-lightbulb me-1"></i>Why this score?</h6>
+    <ul class="list-unstyled mb-0">
+      {% for item in explain %}
+      <li class="mb-1"><i class="bi {{ 'bi-check-circle-fill check-pass' if item.positive else 'bi-exclamation-triangle-fill check-fail' }} me-2"></i>{{ item.text }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+renderBarChart(
+  'breakdownChart',
+  ['Skill Match', 'Keyword Match', 'Semantic', 'Education', 'Experience'],
+  [{{ analysis.skill_match_score }}, {{ analysis.keyword_match_score }}, {{ analysis.semantic_score }}, {{ analysis.education_match_score }}, {{ analysis.experience_match_score }}]
+);
+</script>
+{% endblock %}

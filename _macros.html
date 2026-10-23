@@ -1,0 +1,32 @@
+{% macro score_ring(score, label='Compatibility', size=168) %}
+{% set color = '#0f9d6e' if score >= 65 else ('#d97706' if score >= 40 else '#dc2626') %}
+<div class="score-ring-wrap" data-score-ring="{{ score }}" style="width:{{ size }}px;height:{{ size }}px;">
+  <svg viewBox="0 0 168 168">
+    <circle cx="84" cy="84" r="72" fill="none" stroke="#e3e7f1" stroke-width="14"></circle>
+    <circle class="ring-progress" cx="84" cy="84" r="72" fill="none" stroke="{{ color }}" stroke-width="14" stroke-linecap="round"></circle>
+  </svg>
+  <div class="score-ring-text">
+    <div class="score-number">{{ score|pct }}%</div>
+    <div class="score-caption">{{ label }}</div>
+  </div>
+</div>
+{% endmacro %}
+
+{% macro skill_badges(skills, css_class) %}
+  {% for s in skills %}<span class="skill-badge {{ css_class }}"><i class="bi {{ 'bi-check-circle' if css_class == 'matching' else ('bi-exclamation-circle' if css_class == 'missing' else 'bi-plus-circle') }}"></i>{{ s }}</span>{% endfor %}
+{% endmacro %}
+
+{% macro priority_badge(priority) %}
+<span class="priority-badge priority-{{ priority }}">{{ priority }}</span>
+{% endmacro %}
+
+{% macro analysis_nav(analysis_id, active) %}
+<ul class="nav analysis-tabs mb-4 flex-wrap">
+  <li class="nav-item"><a class="nav-link {{ 'active' if active == 'report' }}" href="{{ url_for('analysis.report', analysis_id=analysis_id) }}">Overview</a></li>
+  <li class="nav-item"><a class="nav-link {{ 'active' if active == 'compatibility' }}" href="{{ url_for('analysis.compatibility', analysis_id=analysis_id) }}">Compatibility</a></li>
+  <li class="nav-item"><a class="nav-link {{ 'active' if active == 'skill_gap' }}" href="{{ url_for('analysis.skill_gap', analysis_id=analysis_id) }}">Skill Gap</a></li>
+  <li class="nav-item"><a class="nav-link {{ 'active' if active == 'ats' }}" href="{{ url_for('analysis.ats', analysis_id=analysis_id) }}">ATS Analysis</a></li>
+  <li class="nav-item"><a class="nav-link {{ 'active' if active == 'improvement' }}" href="{{ url_for('analysis.improvement', analysis_id=analysis_id) }}">Improvements</a></li>
+  <li class="nav-item"><a class="nav-link {{ 'active' if active == 'recommendations' }}" href="{{ url_for('analysis.recommendations', analysis_id=analysis_id) }}">Recommendations</a></li>
+</ul>
+{% endmacro %}

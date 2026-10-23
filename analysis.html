@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block title %}{{ resume.file_name }}{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-start mb-4 flex-wrap gap-2">
+    <div>
+      <h2 class="fw-bold mb-1">{{ resume.file_name }}</h2>
+      <p class="text-muted mb-0">Uploaded {{ resume.upload_date|dt }}</p>
+    </div>
+    <div class="d-flex gap-2">
+      <a href="{{ url_for('job.new_job', resume_id=resume.resume_id) }}" class="btn btn-primary"><i class="bi bi-magic me-1"></i>Analyze Against a Job</a>
+      <form method="POST" action="{{ url_for('resume.delete_resume_route', resume_id=resume.resume_id) }}" onsubmit="return confirm('Delete this resume? This cannot be undone.');">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="btn btn-outline-danger"><i class="bi bi-trash"></i></button>
+      </form>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-md-4">
+      <div class="card p-4 mb-4">
+        <h6 class="fw-bold mb-3">Contact Details</h6>
+        <p class="mb-2"><i class="bi bi-person me-2 text-muted"></i>{{ parsed.name or 'Not detected' }}</p>
+        <p class="mb-2"><i class="bi bi-envelope me-2 text-muted"></i>{{ parsed.email or 'Not detected' }}</p>
+        <p class="mb-2"><i class="bi bi-telephone me-2 text-muted"></i>{{ parsed.phone or 'Not detected' }}</p>
+        {% if parsed.linkedin %}<p class="mb-2"><i class="bi bi-linkedin me-2 text-muted"></i>{{ parsed.linkedin }}</p>{% endif %}
+        {% if parsed.github %}<p class="mb-0"><i class="bi bi-github me-2 text-muted"></i>{{ parsed.github }}</p>{% endif %}
+      </div>
+      <div class="card p-4">
+        <h6 class="fw-bold mb-3">Quick Facts</h6>
+        <p class="mb-2 small">Education level: <strong>{{ parsed.education_keyword|title if parsed.education_keyword else 'Not detected' }}</strong></p>
+        <p class="mb-2 small">Experience mentioned: <strong>{{ (parsed.experience_years ~ '+ years') if parsed.experience_years else 'Not detected' }}</strong></p>
+        <p class="mb-2 small">Measurable achievements: <strong>{{ parsed.measurable_achievements }}</strong></p>
+        <p class="mb-0 small">Word count: <strong>{{ parsed.word_count }}</strong></p>
+      </div>
+    </div>
+    <div class="col-md-8">
+      <div class="card p-4 mb-4">
+        <h6 class="fw-bold mb-3">Detected Skills ({{ parsed.skills|length }})</h6>
+        {% if parsed.skills %}
+          {% for s in parsed.skills %}<span class="skill-badge additional">{{ s }}</span>{% endfor %}
+        {% else %}<p class="text-muted mb-0">No known skills detected — consider adding a dedicated Skills section.</p>{% endif %}
+      </div>
+      <div class="card p-4 mb-4">
+        <h6 class="fw-bold mb-3">Sections Found</h6>
+        {% if parsed.sections_found %}
+          {% for s in parsed.sections_found %}<span class="badge bg-light text-dark border me-1 mb-1 text-capitalize py-2 px-3">{{ s }}</span>{% endfor %}
+        {% else %}<p class="text-muted mb-0">No standard sections detected — consider adding clear headings like "Experience" and "Education".</p>{% endif %}
+      </div>
+
+      <div class="card p-4">
+        <h6 class="fw-bold mb-3">Run Analysis Against a Saved Job Description</h6>
+        {% if jobs %}
+        <form method="POST" action="{{ url_for('analysis.run') }}" class="row g-2 align-items-end">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <input type="hidden" name="resume_id" value="{{ resume.resume_id }}">
+          <div class="col-sm-8">
+            <select class="form-select" name="job_id" required>
+              <option value="" disabled selected>Choose a job description...</option>
+              {% for j in jobs %}<option value="{{ j.job_id }}">{{ j.job_title }}{{ ' — ' + j.company if j.company }}</option>{% endfor %}
+            </select>
+          </div>
+          <div class="col-sm-4">
+            <button type="submit" class="btn btn-primary w-100">Run Analysis</button>
+          </div>
+        </form>
+        {% else %}
+        <p class="text-muted mb-2">You haven't saved any job descriptions yet.</p>
+        <a href="{{ url_for('job.new_job', resume_id=resume.resume_id) }}" class="btn btn-primary btn-sm">Add a Job Description</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

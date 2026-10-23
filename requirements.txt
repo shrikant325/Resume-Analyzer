@@ -1,0 +1,31 @@
+# ResumeIQ — Python dependencies
+#
+# Only these five packages are required to run the app (SQLite backend,
+# TF-IDF based NLP, no external services). Install with:
+#   pip install -r requirements.txt
+
+Flask>=3.0,<4.0
+scikit-learn>=1.3,<2.0
+numpy>=1.24,<3.0
+pypdf>=4.0,<7.0
+python-docx>=1.1,<2.0
+
+
+# ---------------------------------------------------------------------------
+# Optional extras — uncomment only the ones you want. The app works fully
+# without any of these; each one is a drop-in upgrade. See README.md for
+# exactly how to enable each one.
+# ---------------------------------------------------------------------------
+
+# MySQL backend instead of the default SQLite:
+#   set DB_BACKEND=mysql (and MYSQL_HOST/PORT/USER/PASSWORD/DB) in your .env
+# PyMySQL>=1.1,<2.0
+
+# NLTK for tokenization/stopwords/lemmatization (used automatically if its
+# data is already downloaded locally; otherwise a built-in fallback is used):
+# nltk>=3.8,<4.0
+#   after installing, run once: python -m nltk.downloader punkt punkt_tab stopwords wordnet omw-1.4
+
+# sentence-transformers for embedding-based semantic similarity instead of
+# the default TF-IDF fallback (also set USE_SENTENCE_TRANSFORMERS=true):
+# sentence-transformers>=3.0,<4.0

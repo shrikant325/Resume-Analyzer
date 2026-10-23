@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% from "_macros.html" import score_ring, skill_badges, priority_badge, analysis_nav %}
+{% block title %}{{ analysis.job_title }} — Report{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-1">
+    <div>
+      <h2 class="fw-bold mb-1">{{ analysis.job_title }}{% if analysis.company %} <span class="text-muted fw-normal">at {{ analysis.company }}</span>{% endif %}</h2>
+      <p class="text-muted mb-0">Resume: {{ analysis.resume_file_name }} &middot; Analyzed {{ analysis.analysis_date|dt }}</p>
+    </div>
+  </div>
+
+  {{ analysis_nav(analysis.analysis_id, 'report') }}
+
+  <div class="row g-4 mb-4">
+    <div class="col-md-3">
+      <div class="card text-center p-4 h-100 d-flex flex-column justify-content-center">
+        {{ score_ring(analysis.compatibility_score, 'Compatibility') }}
+        <div class="mt-3 fw-semibold">{{ interpretation }}</div>
+      </div>
+    </div>
+    <div class="col-md-9">
+      <div class="row g-3 h-100">
+        <div class="col-6 col-lg-3">
+          <div class="stat-card border h-100">
+            <div class="stat-value">{{ analysis.ats_score|pct }}</div>
+            <div class="stat-label">ATS Score</div>
+          </div>
+        </div>
+        <div class="col-6 col-lg-3">
+          <div class="stat-card border h-100">
+            <div class="stat-value">{{ analysis.skill_match_score|pct }}%</div>
+            <div class="stat-label">Skill Match</div>
+          </div>
+        </div>
+        <div class="col-6 col-lg-3">
+          <div class="stat-card border h-100">
+            <div class="stat-value">{{ analysis.keyword_match_score|pct }}%</div>
+            <div class="stat-label">Keyword Match</div>
+          </div>
+        </div>
+        <div class="col-6 col-lg-3">
+          <div class="stat-card border h-100">
+            <div class="stat-value">{{ analysis.semantic_score|pct }}%</div>
+            <div class="stat-label">Semantic Similarity</div>
+          </div>
+        </div>
+        <div class="col-12">
+          <div class="card p-3 h-100">
+            <h6 class="fw-bold mb-2"><i class="bi bi-lightbulb me-1"></i>Why this score?</h6>
+            <ul class="list-unstyled mb-0">
+              {% for item in explain %}
+              <li class="mb-1"><i class="bi {{ 'bi-check-circle-fill check-pass' if item.positive else 'bi-exclamation-triangle-fill check-fail' }} me-2"></i>{{ item.text }}</li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4 mb-4">
+    <div class="col-md-6">
+      <div class="card p-4 h-100">
+        <h6 class="fw-bold mb-3">Matching Skills ({{ matching|length }})</h6>
+        {% if matching %}{{ skill_badges(matching, 'matching') }}{% else %}<p class="text-muted mb-0">No direct skill matches found.</p>{% endif %}
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card p-4 h-100">
+        <h6 class="fw-bold mb-3">Missing Skills ({{ missing|length }})</h6>
+        {% if missing %}
+          {% for name, priority in missing %}<span class="skill-badge missing">{{ name }}</span>{% endfor %}
+        {% else %}<p class="text-muted mb-0">Great — no missing required skills!</p>{% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="card p-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h6 class="fw-bold mb-0">Top Recommendations</h6>
+      <a href="{{ url_for('analysis.improvement', analysis_id=analysis.analysis_id) }}" class="small">View all</a>
+    </div>
+    {% if improvements %}
+    <div class="row">
+      {% for rec in improvements[:4] %}
+      <div class="col-md-6 mb-3">
+        <div class="d-flex align-items-start gap-2">
+          {{ priority_badge(rec.priority) }}
+          <span class="small">{{ rec.recommendation_text }}</span>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <p class="text-muted mb-0">No specific improvement suggestions — nice work!</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

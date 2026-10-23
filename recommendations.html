@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% from "_macros.html" import priority_badge, analysis_nav %}
+{% block title %}Recommended Skills{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <h2 class="fw-bold mb-1">Recommended Skills</h2>
+  <p class="text-muted mb-4">Based on {{ analysis.job_title }}{% if analysis.company %} at {{ analysis.company }}{% endif %} and your current skill gap.</p>
+
+  {{ analysis_nav(analysis.analysis_id, 'recommendations') }}
+
+  {% if skill_recs %}
+  <div class="card p-4">
+    <h6 class="fw-bold mb-3">Skills to Learn or Add ({{ skill_recs|length }})</h6>
+    <div class="row">
+      {% for rec in skill_recs %}
+      <div class="col-md-6 mb-3">
+        <div class="d-flex align-items-center justify-content-between border rounded-3 p-3" style="border-color: var(--border) !important;">
+          <span class="fw-semibold">{{ loop.index }}. {{ rec.recommendation_text }}</span>
+          {{ priority_badge(rec.priority) }}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% else %}
+  <div class="card p-4 text-center py-5">
+    <i class="bi bi-stars fs-1 mb-2" style="color: var(--success);"></i>
+    <p class="mb-0 fw-semibold">You already cover every skill this job is looking for!</p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

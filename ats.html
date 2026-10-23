@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% from "_macros.html" import score_ring, analysis_nav %}
+{% block title %}ATS Analysis{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <h2 class="fw-bold mb-1">ATS Analysis</h2>
+  <p class="text-muted mb-4">{{ analysis.job_title }}{% if analysis.company %} at {{ analysis.company }}{% endif %} &middot; Resume: {{ analysis.resume_file_name }}</p>
+
+  {{ analysis_nav(analysis.analysis_id, 'ats') }}
+
+  <div class="row g-4">
+    <div class="col-md-4">
+      <div class="card p-4 text-center h-100 d-flex flex-column justify-content-center">
+        {{ score_ring(analysis.ats_score, 'ATS Score') }}
+        <p class="text-muted small mt-3 mb-0">How well an Applicant Tracking System is likely to parse and rank this resume for this job.</p>
+      </div>
+    </div>
+    <div class="col-md-8">
+      <div class="card p-4 h-100">
+        <h6 class="fw-bold mb-1">Why this score?</h6>
+        <p class="text-muted small mb-3">Six weighted checks make up the ATS score.</p>
+        {% for check in ats_checks %}
+        <div class="check-row">
+          <i class="bi {{ 'bi-check-circle-fill check-pass' if check.passed else 'bi-exclamation-triangle-fill check-fail' }} mt-1"></i>
+          <div>
+            <div class="fw-semibold small">{{ check.label }}</div>
+            <div class="text-muted small">{{ check.detail }}</div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

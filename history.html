@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Analysis History{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <h2 class="fw-bold mb-1">Analysis History</h2>
+  <p class="text-muted mb-4">Every compatibility analysis you've run.</p>
+
+  {% if analyses %}
+  <div class="card p-0">
+    <div class="table-responsive">
+      <table class="table align-middle mb-0">
+        <thead><tr class="text-muted small text-uppercase">
+          <th class="ps-4">Job</th><th>Resume</th><th>Compatibility</th><th>ATS</th><th>Skill Match</th><th>Date</th><th></th>
+        </tr></thead>
+        <tbody>
+        {% for a in analyses %}
+          <tr>
+            <td class="ps-4">
+              <div class="fw-semibold">{{ a.job_title }}</div>
+              {% if a.company %}<div class="text-muted small">{{ a.company }}</div>{% endif %}
+            </td>
+            <td class="text-muted small">{{ a.resume_file_name }}</td>
+            <td class="font-mono">{{ a.compatibility_score|pct }}%</td>
+            <td class="font-mono">{{ a.ats_score|pct }}</td>
+            <td class="font-mono">{{ a.skill_match_score|pct }}%</td>
+            <td class="text-muted small">{{ a.analysis_date|dt('%b %d, %Y') }}</td>
+            <td><a href="{{ url_for('analysis.report', analysis_id=a.analysis_id) }}" class="btn btn-sm btn-outline-primary">View</a></td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {% else %}
+  <div class="card p-4 text-center py-5">
+    <i class="bi bi-clock-history fs-1 mb-2 text-muted"></i>
+    <p class="mb-3">You haven't run any analyses yet.</p>
+    <a href="{{ url_for('resume.upload') }}" class="btn btn-primary">Upload a Resume</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
